@@ -46,9 +46,11 @@ add_link_options(
 
 file(GLOB SRC_FILES
     weatherstation/*.c
+    common/*.c
 )
 
 add_executable(${TARGET}.elf ${SRC_FILES})
+target_include_directories(${TARGET}.elf PRIVATE common)
 
 # ==============================
 # Generar archivo HEX

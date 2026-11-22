@@ -27,7 +27,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 project(lora_remote C ASM)
 
 set(TARGET firmware_remote)
-set(WS ../weatherstation)
+set(COMMON ../common)
 
 add_compile_options(
     -mmcu=${MCU}
@@ -50,14 +50,14 @@ add_link_options(
 
 add_executable(${TARGET}.elf
     main.c
-    ${WS}/bme280.c
-    ${WS}/twi.c
-    ${WS}/spi.c
-    ${WS}/sx127x.c
-    ${WS}/lora_proto.c
+    ${COMMON}/bme280.c
+    ${COMMON}/twi.c
+    ${COMMON}/spi.c
+    ${COMMON}/sx127x.c
+    ${COMMON}/lora_proto.c
 )
 
-target_include_directories(${TARGET}.elf PRIVATE ${WS})
+target_include_directories(${TARGET}.elf PRIVATE ${COMMON})
 
 add_custom_command(
     TARGET ${TARGET}.elf POST_BUILD
