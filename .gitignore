@@ -3,6 +3,7 @@
 *.elf
 *.map
 *.zip
+fp-info-cache
 src/build/
 src/lora_remote/build_node*/
 build/
