@@ -831,7 +831,7 @@ int main(void)
     bme_present = bme280_init();
     pred_init();
 
-    // Nodo remoto LoRa (SX1276/78 por SPI en PD2=CS, PD3=RESET)
+    // Radio local LoRa: DIO0=PD3, RESET=PD4, CS/NSS=PD5; SPI por hardware.
     lora_present = sx127x_init();
 
     welcome();

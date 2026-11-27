@@ -126,6 +126,9 @@ uint8_t sx127x_init(void)
     SX127X_RST_PORT |= (uint8_t)(1 << SX127X_RST_BIT);
     _delay_ms(10);
 
+    // DIO0 se reserva como entrada para la señal de interrupción del SX127x.
+    SX127X_DIO0_DDR &= (uint8_t)~(1 << SX127X_DIO0_BIT);
+
     spi_init();
 
     version = sx127x_read_reg(REG_VERSION);

@@ -14,15 +14,20 @@
 #define SX127X_FREQ_HZ 868000000UL   // RFM95W UE (Ra-02: 433000000UL)
 #endif
 
-// CS en PD2, RESET en PD3 (libres en el header J7 si no se usa
-// la IOExtension). CS debe tener pull-up externo a 3.3 V.
+// CS en PD5, RESET en PD4 y DIO0 en PD3.
+// CS debe tener pull-up externo a 3.3 V.
 #define SX127X_CS_DDR   DDRD
 #define SX127X_CS_PORT  PORTD
-#define SX127X_CS_BIT   PD2
+#define SX127X_CS_BIT   PD5
 
 #define SX127X_RST_DDR  DDRD
 #define SX127X_RST_PORT PORTD
-#define SX127X_RST_BIT  PD3
+#define SX127X_RST_BIT  PD4
+
+#define SX127X_DIO0_DDR   DDRD
+#define SX127X_DIO0_PORT  PORTD
+#define SX127X_DIO0_PIN   PIND
+#define SX127X_DIO0_BIT   PD3
 
 #define SX127X_MAX_PAYLOAD 64
 
