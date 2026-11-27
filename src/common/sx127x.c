@@ -127,14 +127,18 @@ uint8_t sx127x_init(void)
     SX127X_DIO0_DDR &= (uint8_t)~(1 << SX127X_DIO0_BIT);
     SX127X_DIO0_PORT &= (uint8_t)~(1 << SX127X_DIO0_BIT);
 
-    // Preparar SPI maestro antes de liberar RESET.
-    spi_init();
-
     SX127X_RST_DDR |= (uint8_t)(1 << SX127X_RST_BIT);
     SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT);
+
+    // Mantener MOSI y SCK inactivos mientras el modulo esta en reset.
+    spi_init();
     _delay_ms(10);
+
+    // Preparar SPI maestro antes de liberar RESET.
+    // Restaurar el modo maestro despues de mantener el SX127x en reset.
+    spi_init();
     SX127X_RST_PORT |= (uint8_t)(1 << SX127X_RST_BIT);
-    _delay_ms(10);
+    _delay_ms(20);
 
     version = sx127x_read_reg(REG_VERSION);
     sx127x_version = version;
