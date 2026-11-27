@@ -871,6 +871,17 @@ int main(void)
     else
     {
         uart_tx_string_P(PSTR("SX127X NOT DETECTED\r\n"));
+        uart_tx_string_P(PSTR("SX127X VERSION REG=0x"));
+        {
+            char version_hex[3];
+            uint8_t version = sx127x_get_version();
+            const char hex_digits[] = "0123456789ABCDEF";
+            version_hex[0] = hex_digits[(version >> 4) & 0x0F];
+            version_hex[1] = hex_digits[version & 0x0F];
+            version_hex[2] = '\0';
+            uart_tx_string(version_hex);
+        }
+        uart_tx_string_P(PSTR("\r\n"));
     }
 
     while(1)

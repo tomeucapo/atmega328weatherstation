@@ -43,6 +43,8 @@
 
 #define SX127X_VERSION           0x12
 
+static uint8_t sx127x_version;
+
 // FRF = freq * 2^19 / 32 MHz
 #define SX127X_FRF ((uint32_t)(((uint64_t)SX127X_FREQ_HZ * 524288ULL) / 32000000ULL))
 
@@ -116,22 +118,26 @@ uint8_t sx127x_init(void)
 {
     uint8_t version;
 
-    // CS en alto antes de tocar el bus (ISP comparte pines).
-    SX127X_CS_DDR |= (uint8_t)(1 << SX127X_CS_BIT);
+    // Mantener NSS alto al arrancar; configurar primero el latch para evitar
+    // un pulso bajo al convertir PD5 en salida.
     SX127X_CS_PORT |= (uint8_t)(1 << SX127X_CS_BIT);
+    SX127X_CS_DDR |= (uint8_t)(1 << SX127X_CS_BIT);
+
+    // DIO0 es entrada; desactivar pull-up para que lo controle el modulo.
+    SX127X_DIO0_DDR &= (uint8_t)~(1 << SX127X_DIO0_BIT);
+    SX127X_DIO0_PORT &= (uint8_t)~(1 << SX127X_DIO0_BIT);
+
+    // Preparar SPI maestro antes de liberar RESET.
+    spi_init();
 
     SX127X_RST_DDR |= (uint8_t)(1 << SX127X_RST_BIT);
     SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT);
-    _delay_ms(1);
+    _delay_ms(10);
     SX127X_RST_PORT |= (uint8_t)(1 << SX127X_RST_BIT);
     _delay_ms(10);
 
-    // DIO0 se reserva como entrada para la señal de interrupción del SX127x.
-    SX127X_DIO0_DDR &= (uint8_t)~(1 << SX127X_DIO0_BIT);
-
-    spi_init();
-
     version = sx127x_read_reg(REG_VERSION);
+    sx127x_version = version;
     if(version != SX127X_VERSION)
         return 0;
 
@@ -169,6 +175,11 @@ uint8_t sx127x_init(void)
     sx127x_set_rx();
 
     return 1;
+}
+
+uint8_t sx127x_get_version(void)
+{
+    return sx127x_version;
 }
 
 void sx127x_set_rx(void)

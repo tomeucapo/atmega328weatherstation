@@ -34,6 +34,9 @@
 // Devuelve 1 si el chip responde (RegVersion valido) y queda en RX.
 uint8_t sx127x_init(void);
 
+// Ultimo valor leido del registro RegVersion (0x42) durante la inicializacion.
+uint8_t sx127x_get_version(void);
+
 // Deja el radio en recepcion continua.
 void sx127x_set_rx(void);
 
