@@ -44,6 +44,7 @@
 #define SX127X_VERSION           0x12
 
 static uint8_t sx127x_version;
+static uint8_t sx127x_rf_enabled;
 
 // FRF = freq * 2^19 / 32 MHz
 #define SX127X_FRF ((uint32_t)(((uint64_t)SX127X_FREQ_HZ * 524288ULL) / 32000000ULL))
@@ -116,7 +117,10 @@ static uint8_t sx127x_wait_irq(uint8_t mask, uint16_t timeout_ms)
 
 uint8_t sx127x_init(void)
 {
-    uint8_t version;
+    uint8_t version = 0;
+    uint8_t attempt;
+
+    sx127x_rf_enabled = 1;
 
     // Mantener NSS alto al arrancar; configurar primero el latch para evitar
     // un pulso bajo al convertir PD5 en salida.
@@ -140,7 +144,16 @@ uint8_t sx127x_init(void)
     SX127X_RST_PORT |= (uint8_t)(1 << SX127X_RST_BIT);
     _delay_ms(20);
 
-    version = sx127x_read_reg(REG_VERSION);
+    // Reintentar lecturas iniciales para absorber el tiempo de arranque del radio.
+    for(attempt = 0; attempt < 3; attempt++)
+    {
+        version = sx127x_read_reg(REG_VERSION);
+        if(version == SX127X_VERSION)
+            break;
+
+        _delay_ms(2);
+    }
+
     sx127x_version = version;
     if(version != SX127X_VERSION)
         return 0;
@@ -199,11 +212,16 @@ void sx127x_sleep(void)
     sx127x_write_reg(REG_OP_MODE, (uint8_t)(MODE_LORA | MODE_SLEEP));
 }
 
+void sx127x_set_rf_enabled(uint8_t enabled)
+{
+    sx127x_rf_enabled = enabled ? 1 : 0;
+}
+
 uint8_t sx127x_send(const uint8_t *data, uint8_t len)
 {
     uint8_t ok;
 
-    if(len > SX127X_MAX_PAYLOAD)
+    if(!sx127x_rf_enabled || len > SX127X_MAX_PAYLOAD)
         return 0;
 
     sx127x_standby();

@@ -40,6 +40,9 @@ uint8_t sx127x_get_version(void);
 // Deja el radio en recepcion continua.
 void sx127x_set_rx(void);
 
+// Habilita o inhibe las transmisiones RF; no afecta a la recepcion.
+void sx127x_set_rf_enabled(uint8_t enabled);
+
 // Duerme el radio (bajo consumo entre transmisiones del nodo).
 void sx127x_sleep(void);
 
