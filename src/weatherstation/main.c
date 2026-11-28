@@ -241,16 +241,6 @@ void calculate_anemo_velocity()
 }
 
 
-// ======================================================
-// IO
-// ======================================================
-
-void io_init(void)
-{
-    // Salidas locales; PD3/PD4/PD5 quedan para DIO0/RESET/NSS de LoRa.
-    DDRD |= (1<<DDD6) | (1<<DDD7);
-}
-
 // Reintenta la inicializacion del radio local desde el puerto serie.
 static void serial_lora_init(const char *command)
 {
@@ -875,7 +865,6 @@ int main(void)
     serial_context.lora_init = serial_lora_init;
     serial_commands_init(&serial_context);
 
-    io_init();
     uart_init();
     timer1_init();
     timer0_init();
@@ -936,6 +925,7 @@ int main(void)
     {
         uart_tx_string_P(PSTR("MCP23017 NOT DETECTED\r\n"));
     }
+    
     if(bme_present)
     {
         uart_tx_string_P(PSTR("BME280 DETECTED\r\n"));
@@ -944,6 +934,7 @@ int main(void)
     {
         uart_tx_string_P(PSTR("BME280 NOT DETECTED\r\n"));
     }
+
     if(lora_present)
     {
         uart_tx_string_P(PSTR("SX127X DETECTED\r\n"));
@@ -952,15 +943,7 @@ int main(void)
     {
         uart_tx_string_P(PSTR("SX127X NOT DETECTED\r\n"));
         uart_tx_string_P(PSTR("SX127X VERSION REG=0x"));
-        {
-            char version_hex[3];
-            uint8_t version = sx127x_get_version();
-            const char hex_digits[] = "0123456789ABCDEF";
-            version_hex[0] = hex_digits[(version >> 4) & 0x0F];
-            version_hex[1] = hex_digits[version & 0x0F];
-            version_hex[2] = '\0';
-            uart_tx_string(version_hex);
-        }
+        uart_tx_hex(sx127x_get_version());          
         uart_tx_string_P(PSTR("\r\n"));
     }
 

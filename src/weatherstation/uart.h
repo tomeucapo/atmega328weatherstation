@@ -23,5 +23,6 @@ uint8_t uart_rx_read(void);
 void uart_tx_decimal(int16_t v);
 void uart_tx_uint32(uint32_t v);
 void uart_tx_time(uint32_t seconds);
+void uart_tx_hex(uint8_t v)l
 
 #endif

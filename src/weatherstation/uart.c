@@ -129,4 +129,9 @@ void uart_tx_time(uint32_t seconds)
     uart_tx_string(line);
 }
 
-
+void uart_tx_hex(uint8_t v)
+{
+    const char hex_digits[] = "0123456789ABCDEF";
+    uart_tx_char(hex_digits[(v >> 4) & 0x0F]);
+    uart_tx_char(hex_digits[v & 0x0F]);
+}
