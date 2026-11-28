@@ -5,7 +5,7 @@
 // SPI maestro. Los pines PB3/PB4/PB5 son tambien los del ISP:
 // al programar, el SX127x debe tener CS en alto (pull-up externo
 // recomendado) para no cargar el bus.
-// SPI modo 0, MSB primero. F_CPU/16 = 500 kHz con F_CPU=8 MHz.
+// SPI modo 0, MSB primero. Con F_CPU=8 MHz y SPR0=1: SCK=F_CPU/16=500 kHz.
 // ======================================================
 
 void spi_init(void)

@@ -203,6 +203,10 @@ static void handle_command(const char *command)
     {
         command_context->lora_init(command);
     }
+    else if(strcmp(command, "@LORA_PROBE") == 0)
+    {
+        command_context->lora_init(command);
+    }
     else if(strcmp(command, "@FORECAST") == 0)
     {
         char fbuf[48];

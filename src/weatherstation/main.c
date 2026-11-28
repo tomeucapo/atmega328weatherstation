@@ -254,7 +254,7 @@ void io_init(void)
 // Reintenta la inicializacion del radio local desde el puerto serie.
 static void serial_lora_init(const char *command)
 {
-    uint8_t version;
+    uint8_t version = 0;
     uint8_t detailed = (command[10] == ' ' &&
                         command[11] == 'D' &&
                         command[12] == 'E' &&
@@ -264,10 +264,22 @@ static void serial_lora_init(const char *command)
                         command[16] == 'L');
     static const char hex[] = "0123456789ABCDEF";
 
+    if(strcmp(command, "@LORA_PROBE") == 0)
+    {
+        version = sx127x_probe_version();
+        lora_present = (version == 0x12);
+        uart_tx_string_P(PSTR("LORA_PROBE_VERSION=0x"));
+        uart_tx_char(hex[(version >> 4) & 0x0F]);
+        uart_tx_char(hex[version & 0x0F]);
+        uart_tx_string_P(lora_present ? PSTR(" STATUS=OK\r\n") :
+                                       PSTR(" STATUS=FAIL\r\n"));
+        return;
+    }
+
     lora_present = sx127x_init();
     version = sx127x_get_version();
 
-    uart_tx_string_P(PSTR("LORA_INIT="));
+    uart_tx_string_P(PSTR("LORA_INIT_STATUS="));
     if(lora_present)
         uart_tx_string_P(PSTR("OK\r\n"));
     else

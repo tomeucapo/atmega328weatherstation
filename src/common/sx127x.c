@@ -202,6 +202,12 @@ uint8_t sx127x_get_version(void)
     return sx127x_version;
 }
 
+uint8_t sx127x_probe_version(void)
+{
+    sx127x_version = sx127x_read_reg(REG_VERSION);
+    return sx127x_version;
+}
+
 void sx127x_set_rx(void)
 {
     sx127x_standby();
