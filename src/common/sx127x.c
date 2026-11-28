@@ -66,8 +66,10 @@ static uint8_t sx127x_read_reg(uint8_t reg)
     uint8_t val;
 
     CS_LOW();
+    _delay_us(2);
     spi_transfer((uint8_t)(reg & 0x7F));
     val = spi_transfer(0x00);
+    _delay_us(2);
     CS_HIGH();
 
     return val;
