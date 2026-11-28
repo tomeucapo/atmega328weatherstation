@@ -124,17 +124,16 @@ uint8_t sx127x_init(void)
 
     sx127x_rf_enabled = 1;
 
-    // NSS alto y RESET bajo antes de convertir los pines en salidas.
+    // NSS alto antes de habilitar la salida para evitar seleccionar el radio.
     SX127X_CS_PORT |= (uint8_t)(1 << SX127X_CS_BIT);
     SX127X_CS_DDR |= (uint8_t)(1 << SX127X_CS_BIT);
+
+    SX127X_RST_DDR |= (uint8_t)(1 << SX127X_RST_BIT);
+    SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT);
 
     // DIO0 es entrada; desactivar pull-up para que lo controle el modulo.
     SX127X_DIO0_DDR &= (uint8_t)~(1 << SX127X_DIO0_BIT);
     SX127X_DIO0_PORT &= (uint8_t)~(1 << SX127X_DIO0_BIT);
-
-    // Asegurar nivel de reset bajo antes de seleccionar el pin como salida.
-    SX127X_RST_DDR |= (uint8_t)(1 << SX127X_RST_BIT);
-    SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT);
 
     // Configurar SPI modo 0 antes de liberar el reset del transceptor.
     spi_init();

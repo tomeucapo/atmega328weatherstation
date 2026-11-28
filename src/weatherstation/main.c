@@ -247,7 +247,7 @@ void calculate_anemo_velocity()
 
 void io_init(void)
 {
-    // Configurar solo las salidas locales; preservar el resto del puerto D.
+    // Salidas locales; PD3/PD4/PD5 quedan para DIO0/RESET/NSS de LoRa.
     DDRD |= (1<<DDD6) | (1<<DDD7);
 }
 
