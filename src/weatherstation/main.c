@@ -247,8 +247,8 @@ void calculate_anemo_velocity()
 
 void io_init(void)
 {
-    // No sobrescribir todos los bits: PD5 se usa como NSS del SX127x.
-    DDRD = (1<<DDD6) | (1<<DDD7);
+    // Configurar solo las salidas locales, sin cambiar PD5 (NSS) ni PD4 (RESET).
+    DDRD |= (1<<DDD6) | (1<<DDD7);
 }
 
 // ======================================================

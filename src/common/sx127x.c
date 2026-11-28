@@ -122,8 +122,7 @@ uint8_t sx127x_init(void)
 
     sx127x_rf_enabled = 1;
 
-    // Mantener NSS alto al arrancar; configurar primero el latch para evitar
-    // un pulso bajo al convertir PD5 en salida.
+    // Preparar latch y salida de NSS antes de iniciar SPI.
     SX127X_CS_PORT |= (uint8_t)(1 << SX127X_CS_BIT);
     SX127X_CS_DDR |= (uint8_t)(1 << SX127X_CS_BIT);
 
@@ -131,18 +130,16 @@ uint8_t sx127x_init(void)
     SX127X_DIO0_DDR &= (uint8_t)~(1 << SX127X_DIO0_BIT);
     SX127X_DIO0_PORT &= (uint8_t)~(1 << SX127X_DIO0_BIT);
 
-    SX127X_RST_DDR |= (uint8_t)(1 << SX127X_RST_BIT);
+    // Asegurar nivel de reset bajo antes de seleccionar el pin como salida.
     SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT);
+    SX127X_RST_DDR |= (uint8_t)(1 << SX127X_RST_BIT);
 
-    // Mantener MOSI y SCK inactivos mientras el modulo esta en reset.
+    // El bus SPI queda configurado una vez mientras el radio permanece en reset.
     spi_init();
     _delay_ms(10);
 
-    // Preparar SPI maestro antes de liberar RESET.
-    // Restaurar el modo maestro despues de mantener el SX127x en reset.
-    spi_init();
     SX127X_RST_PORT |= (uint8_t)(1 << SX127X_RST_BIT);
-    _delay_ms(20);
+    _delay_ms(50);
 
     // Reintentar lecturas iniciales para absorber el tiempo de arranque del radio.
     for(attempt = 0; attempt < 3; attempt++)
