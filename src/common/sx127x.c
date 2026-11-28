@@ -122,6 +122,14 @@ static uint8_t sx127x_wait_irq(uint8_t mask, uint16_t timeout_ms)
     return 0;
 }
 
+void sx127x_reset(void)
+{
+    SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT); // RESET en bajo para resetear el modulo
+    _delay_ms(1);
+    SX127X_RST_PORT |= (uint8_t)(1 << SX127X_RST_BIT); 
+    _delay_ms(5);
+}
+
 uint8_t sx127x_init(void)
 {
     uint8_t version = 0;
@@ -133,8 +141,8 @@ uint8_t sx127x_init(void)
     SX127X_CS_PORT |= (uint8_t)(1 << SX127X_CS_BIT);
     SX127X_CS_DDR |= (uint8_t)(1 << SX127X_CS_BIT);
 
-    SX127X_RST_DDR |= (uint8_t)(1 << SX127X_RST_BIT);
-    SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT);
+    SX127X_RST_DDR |= (uint8_t)(1 << SX127X_RST_BIT);               
+    SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT);         
 
     // DIO0 es entrada; desactivar pull-up para que lo controle el modulo.
     SX127X_DIO0_DDR &= (uint8_t)~(1 << SX127X_DIO0_BIT);
@@ -142,19 +150,17 @@ uint8_t sx127x_init(void)
 
     // Configurar SPI modo 0 antes de liberar el reset del transceptor.
     spi_init();
-    _delay_ms(10);
 
-    SX127X_RST_PORT |= (uint8_t)(1 << SX127X_RST_BIT);
-    _delay_ms(10);
+    sx127x_reset();
 
     // Reintentar lecturas iniciales para absorber el tiempo de arranque del radio.
-    for(attempt = 0; attempt < 3; attempt++)
+    for(attempt = 0; attempt < 10; attempt++)
     {
         version = sx127x_read_reg(REG_VERSION);
         if(version == SX127X_VERSION)
             break;
 
-        _delay_ms(2);
+        _delay_ms(10);
     }
 
     sx127x_version = version;

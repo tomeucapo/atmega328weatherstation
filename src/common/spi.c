@@ -10,8 +10,8 @@
 
 void spi_init(void)
 {
-    DDRB |= (1 << DDB3) | (1 << DDB5);
-    DDRB &= ~(1 << DDB4);
+    DDRB |= (1 << DDB3) | (1 << DDB5);  // MOSI y SCK como salida
+    DDRB &= ~(1 << DDB4);               // MISO como entrada
 
     SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
     // Escribir cero en SPI2X (SPI2X es el bit 0); no borrar flags reservados.
