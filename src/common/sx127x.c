@@ -122,7 +122,7 @@ uint8_t sx127x_init(void)
 
     sx127x_rf_enabled = 1;
 
-    // Preparar latch y salida de NSS antes de iniciar SPI.
+    // NSS alto y RESET bajo antes de convertir los pines en salidas.
     SX127X_CS_PORT |= (uint8_t)(1 << SX127X_CS_BIT);
     SX127X_CS_DDR |= (uint8_t)(1 << SX127X_CS_BIT);
 
@@ -131,10 +131,10 @@ uint8_t sx127x_init(void)
     SX127X_DIO0_PORT &= (uint8_t)~(1 << SX127X_DIO0_BIT);
 
     // Asegurar nivel de reset bajo antes de seleccionar el pin como salida.
-    SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT);
     SX127X_RST_DDR |= (uint8_t)(1 << SX127X_RST_BIT);
+    SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT);
 
-    // El bus SPI queda configurado una vez mientras el radio permanece en reset.
+    // Configurar SPI antes de liberar el reset del transceptor.
     spi_init();
     _delay_ms(10);
 

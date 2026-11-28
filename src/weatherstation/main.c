@@ -247,8 +247,8 @@ void calculate_anemo_velocity()
 
 void io_init(void)
 {
-    // Configurar solo las salidas locales, sin cambiar PD5 (NSS) ni PD4 (RESET).
-    DDRD |= (1<<DDD6) | (1<<DDD7);
+    // Salidas locales. PD5=NSS y PD4=RESET los configura sx127x_init().
+    DDRD = (1<<DDD6) | (1<<DDD7);
 }
 
 // ======================================================
