@@ -37,6 +37,9 @@ uint8_t sx127x_init(void);
 // Ultimo valor leido del registro RegVersion (0x42) durante la inicializacion.
 uint8_t sx127x_get_version(void);
 
+// Lee un registro SX127x por SPI (solo para diagnostico).
+uint8_t sx127x_read_register(uint8_t reg);
+
 // Deja el radio en recepcion continua.
 void sx127x_set_rx(void);
 

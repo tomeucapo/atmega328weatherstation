@@ -251,6 +251,72 @@ void io_init(void)
     DDRD |= (1<<DDD6) | (1<<DDD7);
 }
 
+// Reintenta la inicializacion del radio local desde el puerto serie.
+static void serial_lora_init(const char *command)
+{
+    uint8_t version;
+    uint8_t detailed = (command[10] == ' ' &&
+                        command[11] == 'D' &&
+                        command[12] == 'E' &&
+                        command[13] == 'T' &&
+                        command[14] == 'A' &&
+                        command[15] == 'I' &&
+                        command[16] == 'L');
+    static const char hex[] = "0123456789ABCDEF";
+
+    lora_present = sx127x_init();
+    version = sx127x_get_version();
+
+    uart_tx_string_P(PSTR("LORA_INIT="));
+    if(lora_present)
+        uart_tx_string_P(PSTR("OK\r\n"));
+    else
+        uart_tx_string_P(PSTR("FAIL\r\n"));
+
+    uart_tx_string_P(PSTR("SX127X_VERSION=0x"));
+    uart_tx_char(hex[(version >> 4) & 0x0F]);
+    uart_tx_char(hex[version & 0x0F]);
+    uart_tx_string_P(PSTR("\r\n"));
+
+    if(detailed)
+    {
+        char frequency[12];
+        uint8_t op_mode = sx127x_read_register(0x01);
+        uint8_t modem1 = sx127x_read_register(0x1D);
+        uint8_t modem2 = sx127x_read_register(0x1E);
+        uint8_t modem3 = sx127x_read_register(0x26);
+        uint8_t sync = sx127x_read_register(0x39);
+        uint8_t irq = sx127x_read_register(0x12);
+
+        uart_tx_string_P(PSTR("SX127X_FREQ_HZ="));
+        ultoa(SX127X_FREQ_HZ, frequency, 10);
+        uart_tx_string(frequency);
+        uart_tx_string_P(PSTR("\r\nSPI=MODE0,MSB,F_CPU/16\r\n"));
+        uart_tx_string_P(PSTR("PINS: CS=PD5 RESET=PD4 DIO0=PD3 MOSI=PB3 MISO=PB4 SCK=PB5\r\n"));
+        uart_tx_string_P(PSTR("REG_OP_MODE=0x"));
+        uart_tx_char(hex[(op_mode >> 4) & 0x0F]);
+        uart_tx_char(hex[op_mode & 0x0F]);
+        uart_tx_string_P(PSTR("\r\nREG_MODEM_CONFIG1=0x"));
+        uart_tx_char(hex[(modem1 >> 4) & 0x0F]);
+        uart_tx_char(hex[modem1 & 0x0F]);
+        uart_tx_string_P(PSTR("\r\nREG_MODEM_CONFIG2=0x"));
+        uart_tx_char(hex[(modem2 >> 4) & 0x0F]);
+        uart_tx_char(hex[modem2 & 0x0F]);
+        uart_tx_string_P(PSTR("\r\nREG_MODEM_CONFIG3=0x"));
+        uart_tx_char(hex[(modem3 >> 4) & 0x0F]);
+        uart_tx_char(hex[modem3 & 0x0F]);
+        uart_tx_string_P(PSTR("\r\nREG_SYNC_WORD=0x"));
+        uart_tx_char(hex[(sync >> 4) & 0x0F]);
+        uart_tx_char(hex[sync & 0x0F]);
+        uart_tx_string_P(PSTR("\r\nREG_IRQ_FLAGS=0x"));
+        uart_tx_char(hex[(irq >> 4) & 0x0F]);
+        uart_tx_char(hex[irq & 0x0F]);
+        uart_tx_string_P(PSTR("\r\n"));
+        uart_tx_string_P(PSTR("LORA_INIT_DONE="));
+        uart_tx_string_P(lora_present ? PSTR("OK\r\n") : PSTR("FAIL\r\n"));
+    }
+}
+
 // ======================================================
 // OLED SSD1306
 // ======================================================
@@ -794,6 +860,7 @@ int main(void)
     serial_context.view_mode = &view_mode;
     serial_context.mcp_reserved_pin = BTN_MCP_PIN;
     serial_context.print_ext_status = print_ext_status;
+    serial_context.lora_init = serial_lora_init;
     serial_commands_init(&serial_context);
 
     io_init();

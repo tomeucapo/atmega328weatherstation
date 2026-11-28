@@ -14,6 +14,7 @@ typedef struct {
     uint8_t *view_mode;
     uint8_t mcp_reserved_pin;
     void (*print_ext_status)(uint8_t index, uint8_t numbered);
+    void (*lora_init)(const char *command);
 } serial_command_context_t;
 
 void serial_commands_init(const serial_command_context_t *context);

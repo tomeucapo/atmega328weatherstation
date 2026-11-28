@@ -75,6 +75,11 @@ static uint8_t sx127x_read_reg(uint8_t reg)
     return val;
 }
 
+uint8_t sx127x_read_register(uint8_t reg)
+{
+    return sx127x_read_reg(reg);
+}
+
 static void sx127x_write_burst(uint8_t reg, const uint8_t *buf, uint8_t len)
 {
     CS_LOW();
