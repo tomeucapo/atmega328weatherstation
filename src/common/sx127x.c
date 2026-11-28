@@ -134,12 +134,12 @@ uint8_t sx127x_init(void)
     SX127X_RST_DDR |= (uint8_t)(1 << SX127X_RST_BIT);
     SX127X_RST_PORT &= (uint8_t)~(1 << SX127X_RST_BIT);
 
-    // Configurar SPI antes de liberar el reset del transceptor.
+    // Configurar SPI modo 0 antes de liberar el reset del transceptor.
     spi_init();
     _delay_ms(10);
 
     SX127X_RST_PORT |= (uint8_t)(1 << SX127X_RST_BIT);
-    _delay_ms(50);
+    _delay_ms(10);
 
     // Reintentar lecturas iniciales para absorber el tiempo de arranque del radio.
     for(attempt = 0; attempt < 3; attempt++)
